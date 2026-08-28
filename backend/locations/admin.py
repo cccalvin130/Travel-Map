@@ -1,10 +1,10 @@
 from django.contrib import admin
 from .models import Location, Photo
 
-# 把 Location 模型注册到后台管理界面
-# 注册之后，就能在 http://127.0.0.1:8000/admin/ 里看到并管理地点数据了
+# Register the Location model with the admin interface
+# After registration, you can view and manage location data at http://127.0.0.1:8000/admin/
 admin.site.register(Location)
 
-# 把 Photo 模型注册到后台管理界面
-# 注册之后，就能在后台里看到并管理照片数据了
+# Register the Photo model with the admin interface
+# After registration, you can view and manage photo data in the admin panel
 admin.site.register(Photo)

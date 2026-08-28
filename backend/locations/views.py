@@ -6,61 +6,82 @@ from .models import Location, Photo
 
 def location_to_dict(location):
     """
-    把一个 Location 对象转换成字典
-    因为 Django 的对象不能直接转成 JSON 返回给前端，
-    所以要手动把每个字段取出来，组成字典
+    Convert a Location object to a dictionary.
+    Django objects cannot be sent directly to the frontend,
+    so we convert them to dictionaries first, then to JSON.
     """
-    return {
-        'id': location.id,
-        'name': location.name,
-        'country': location.country,
-        'city': location.city,
-        'latitude': float(location.latitude),
-        'longitude': float(location.longitude),
-        'visit_date': str(location.visit_date) if location.visit_date else None,
-        'notes': location.notes,
-        'photos': [
-            {
-                'id': photo.id,
-                'image': photo.image.url,
-                'description': photo.description,
-            }
-            for photo in location.photos.all()
-        ]
-    }
+    # Create an empty dictionary
+    result = {}
+
+    # Add each field to the dictionary
+    result['id'] = location.id
+    result['name'] = location.name
+    result['country'] = location.country
+    result['city'] = location.city
+    result['latitude'] = location.latitude
+    result['longitude'] = location.longitude
+
+    # Visit date may be empty, so we need to check
+    if location.visit_date:
+        result['visit_date'] = str(location.visit_date)
+    else:
+        result['visit_date'] = None
+
+    result['notes'] = location.notes
+
+    # Add all photos for this location
+    # Note: since we removed related_name in models.py, we use photo_set
+    photos = []
+    for photo in location.photo_set.all():
+        photo_dict = {
+            'id': photo.id,
+            'image': photo.image.url,
+            'description': photo.description,
+        }
+        photos.append(photo_dict)
+    result['photos'] = photos
+
+    return result
 
 
 @csrf_exempt
 def location_list(request):
     """
-    地点列表接口
-    - GET: 获取所有地点
-    - POST: 创建新地点
-    网址: /api/locations/
+    Location list API endpoint
+    URL: /api/locations/
+    GET = get all locations
+    POST = create a new location
     """
 
     if request.method == 'GET':
-        # 从数据库取出所有地点
-        locations = Location.objects.all()
-        # 把每个地点转成字典，组成列表
-        result = [location_to_dict(loc) for loc in locations]
-        # 返回 JSON 给前端
+        # Get all locations from the database
+        all_locations = Location.objects.all()
+
+        # Convert each location to a dictionary and add to a list
+        result = []
+        for location in all_locations:
+            location_dict = location_to_dict(location)
+            result.append(location_dict)
+
+        # Return the result to the frontend
         return JsonResponse({'locations': result})
 
     elif request.method == 'POST':
-        # 读取前端发来的 JSON 数据，转成 Python 字典
+        # Read data sent by the frontend and convert to dictionary
         data = json.loads(request.body)
 
-        # 从字典里取出每个字段的值
+        # Extract each field from the dictionary
         name = data['name']
         country = data['country']
         city = data['city']
         latitude = data['latitude']
         longitude = data['longitude']
-        visit_date = data.get('visit_date')  # get 表示这个字段可以没有
-        notes = data.get('notes', '')         # 没有的话默认是空字符串
 
-        # 创建新地点并保存到数据库
+        # These two fields are optional, use .get() with default values
+        visit_date = data.get('visit_date')
+        notes = data.get('notes', '')
+
+        # Create a new location and save to database
         new_location = Location.objects.create(
             name=name,
             country=country,
@@ -71,9 +92,9 @@ def location_list(request):
             notes=notes,
         )
 
-        # 返回创建成功的消息和新地点的数据
+        # Return success message and the new location data
         return JsonResponse({
-            'message': '创建成功',
+            'message': 'Created successfully',
             'location': location_to_dict(new_location),
         })
 
@@ -81,30 +102,29 @@ def location_list(request):
 @csrf_exempt
 def location_detail(request, location_id):
     """
-    单个地点接口
-    - GET: 获取一个地点的详情
-    - PUT: 修改地点信息
-    - DELETE: 删除地点
-    网址: /api/locations/地点id/
+    Single location API endpoint
+    URL: /api/locations/<location_id>/
+    GET = get details of one location
+    PUT = update one location
+    DELETE = delete one location
     """
 
-    # 根据 id 从数据库找到这个地点
-    # 如果找不到就返回 None
+    # Find location by id, returns None if not found
     location = Location.objects.filter(id=location_id).first()
 
-    # 如果找不到，返回错误
+    # Return error if location not found
     if not location:
-        return JsonResponse({'error': '地点不存在'}, status=404)
+        return JsonResponse({'error': 'Location not found'}, status=404)
 
     if request.method == 'GET':
-        # 返回这个地点的数据
+        # Return this location's data
         return JsonResponse({'location': location_to_dict(location)})
 
     elif request.method == 'PUT':
-        # 读取前端发来的 JSON 数据
+        # Read data sent by the frontend
         data = json.loads(request.body)
 
-        # 如果前端传了这个字段，就更新，否则保持原来的值
+        # Update field only if frontend provided it, otherwise keep original value
         if 'name' in data:
             location.name = data['name']
         if 'country' in data:
@@ -120,58 +140,61 @@ def location_detail(request, location_id):
         if 'notes' in data:
             location.notes = data['notes']
 
-        # 保存修改到数据库
+        # Save changes to database
         location.save()
 
         return JsonResponse({
-            'message': '修改成功',
+            'message': 'Updated successfully',
             'location': location_to_dict(location),
         })
 
     elif request.method == 'DELETE':
-        # 删除这个地点
-        # 注意：因为 Photo 的外键设置了 CASCADE，
-        # 所以删除地点时，这个地点的所有照片也会自动删除
+        # Delete this location
+        # Note: when location is deleted, all its photos are also deleted
+        # automatically (because of CASCADE on the ForeignKey)
         location.delete()
-        return JsonResponse({'message': '删除成功'})
+        return JsonResponse({'message': 'Deleted successfully'})
 
 
 @csrf_exempt
 def photo_list(request, location_id):
     """
-    照片列表接口
-    - GET: 获取某个地点的所有照片
-    - POST: 给某个地点上传新照片
-    网址: /api/locations/地点id/photos/
+    Photo list API endpoint
+    URL: /api/locations/<location_id>/photos/
+    GET = get all photos for a location
+    POST = upload a new photo to a location
     """
 
-    # 先找到对应的地点
+    # First find the location
     location = Location.objects.filter(id=location_id).first()
     if not location:
-        return JsonResponse({'error': '地点不存在'}, status=404)
+        return JsonResponse({'error': 'Location not found'}, status=404)
 
     if request.method == 'GET':
-        # 取出这个地点的所有照片
-        photos = location.photos.all()
-        # 转成字典列表
-        result = [
-            {
+        # Get all photos for this location
+        all_photos = location.photo_set.all()
+
+        # Convert to list of dictionaries
+        result = []
+        for photo in all_photos:
+            photo_dict = {
                 'id': photo.id,
                 'image': photo.image.url,
                 'description': photo.description,
             }
-            for photo in photos
-        ]
+            result.append(photo_dict)
+
         return JsonResponse({'photos': result})
 
     elif request.method == 'POST':
-        # 从请求中取出上传的图片文件
-        # 注意：上传图片不能用 JSON，要用表单格式(multipart/form-data)
+        # Get the uploaded image from the request
+        # Note: image upload cannot use JSON, must use form data (multipart/form-data)
         image_file = request.FILES['image']
-        # 取出图片描述（可以没有）
+
+        # Get photo description, optional
         description = request.POST.get('description', '')
 
-        # 创建新照片并保存
+        # Create a new photo and save to database
         new_photo = Photo.objects.create(
             location=location,
             image=image_file,
@@ -179,7 +202,7 @@ def photo_list(request, location_id):
         )
 
         return JsonResponse({
-            'message': '照片上传成功',
+            'message': 'Photo uploaded successfully',
             'photo': {
                 'id': new_photo.id,
                 'image': new_photo.image.url,
@@ -191,22 +214,22 @@ def photo_list(request, location_id):
 @csrf_exempt
 def photo_detail(request, location_id, photo_id):
     """
-    单张照片接口
-    - DELETE: 删除一张照片
-    网址: /api/locations/地点id/photos/照片id/
+    Single photo API endpoint
+    URL: /api/locations/<location_id>/photos/<photo_id>/
+    DELETE = delete one photo
     """
 
-    # 先找到地点
+    # First find the location
     location = Location.objects.filter(id=location_id).first()
     if not location:
-        return JsonResponse({'error': '地点不存在'}, status=404)
+        return JsonResponse({'error': 'Location not found'}, status=404)
 
-    # 再找到属于这个地点的照片
-    photo = location.photos.filter(id=photo_id).first()
+    # Then find the photo that belongs to this location
+    photo = location.photo_set.filter(id=photo_id).first()
     if not photo:
-        return JsonResponse({'error': '照片不存在'}, status=404)
+        return JsonResponse({'error': 'Photo not found'}, status=404)
 
     if request.method == 'DELETE':
-        # 删除照片
+        # Delete the photo
         photo.delete()
-        return JsonResponse({'message': '照片删除成功'})
+        return JsonResponse({'message': 'Photo deleted successfully'})
