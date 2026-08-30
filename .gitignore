@@ -1,0 +1,22 @@
+# Team member's frontend work (Lau Siew Che - Member 1)
+# Local reference only, do not commit to this branch
+frontend-lau-siew-che/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+backend/db.sqlite3
+backend/db.sqlite3-journal
+
+# Media files
+backend/media/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
