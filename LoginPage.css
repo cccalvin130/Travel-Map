@@ -7,12 +7,12 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(200deg, #f9e6fd, #c9a2df);
+    background: linear-gradient(200deg, #F9EDEB, #88B9E6);
 }
 .container{
     width: 650px;
     height: 415px;
-    background: #fff;
+    background: #ffffff;
     border-radius: 5px;
     box-shadow: 5px 5px 5px rgba(0,0,0,0.1);
     position: relative;
@@ -21,8 +21,8 @@ body{
     position: absolute;
     top: -10%;
     left: 5%;
-    background: #d7dafa;
-    width: 320px;
+    background: #D0E1F1;
+    width: 325px;
     height: 500px;
     border-radius: 5px;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
@@ -62,10 +62,10 @@ input{
     letter-spacing: 2px;
 }
 input::placeholder{
-    color: #fff;
+    color: #ffffff;
 }
 input:focus{
-    color: #fff;
+    color: #ffffff;
     outline: none;
     border-bottom: 1px solid #fff;
     transition: 0.5s;
@@ -79,14 +79,14 @@ input:focus::placeholder{
     margin-top: 35px;
     border: none;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: #FFFFFF;
     color: #000000;
     letter-spacing: 2px;
     cursor: pointer;
     outline: none;
 }
 .form-box button:hover{
-    background-color: #d0d4ff;
+    background-color: #88B9E6;
     color: #fff;
     transition: background-color 0.5s ease;
 }
@@ -107,26 +107,26 @@ input:focus::placeholder{
     right: -2%;
 }
 .con-box h2{
-    color: #9acced;
-    font-size: 25px;
+    color: #88B9E6;
+    font-size: 24px;
     font-weight: bold;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     text-align: center;
     margin-bottom: 4px;
 }
 .con-box p{
-    color: #75a0bd;
+    color: #B3C6DD;
     font-size: 12px;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-align: center;
 }
 .con-box span{
-    color: #f7d0ff;
+    color: #88B9E6;
 }
 .con-box button{
     padding: 6px 10px;
     margin-top: 3%;
-    border: 1px solid #f0eef5;
+    border: 1px solid #E1EBE6;
     border-radius: 5px;
     background-color: #fff;
     color: #000000;
@@ -135,6 +135,6 @@ input:focus::placeholder{
     outline: none;
 }
 .con-box button:hover{
-    background-color: #d0d4ff;
+    background-color: #88B9E6;
     color: #fff;
 }
