@@ -33,7 +33,7 @@ Development: http://127.0.0.1:8000
 
 ## Data Models
 
-### Location (地点)
+### Location
 | Field | Type | Description | Required |
 |---|---|---|---|
 | id | Integer | Unique identifier (auto-generated) | Auto |
@@ -48,7 +48,7 @@ Development: http://127.0.0.1:8000
 | updated_at | DateTime | Last update timestamp (auto-generated) | Auto |
 | photos | Array | List of photos for this location | Auto |
 
-### Photo (照片)
+### Photo
 | Field | Type | Description | Required |
 |---|---|---|---|
 | id | Integer | Unique identifier (auto-generated) | Auto |
@@ -63,7 +63,7 @@ Development: http://127.0.0.1:8000
 
 ---
 
-### 1. Get All Locations (获取所有地点)
+### 1. Get All Locations
 
 Retrieve a list of all saved locations.
 
@@ -111,7 +111,7 @@ Retrieve a list of all saved locations.
 
 ---
 
-### 2. Create New Location (创建新地点)
+### 2. Create New Location
 
 Create a new visited location.
 
@@ -165,7 +165,7 @@ Create a new visited location.
 
 ---
 
-### 3. Get Single Location Detail (获取单个地点详情)
+### 3. Get Single Location Detail
 
 Retrieve detailed information for a specific location by ID.
 
@@ -210,7 +210,7 @@ Retrieve detailed information for a specific location by ID.
 
 ---
 
-### 4. Update Location (更新地点)
+### 4. Update Location
 
 Update information for an existing location. Only fields provided in the request will be updated.
 
@@ -263,7 +263,7 @@ Update information for an existing location. Only fields provided in the request
 
 ---
 
-### 5. Delete Location (删除地点)
+### 5. Delete Location
 
 Delete a location and all its associated photos.
 
@@ -287,7 +287,7 @@ Delete a location and all its associated photos.
 
 ---
 
-### 6. Get All Photos for a Location (获取地点的所有照片)
+### 6. Get All Photos for a Location
 
 Retrieve all photos associated with a specific location.
 
@@ -320,7 +320,7 @@ Retrieve all photos associated with a specific location.
 
 ---
 
-### 7. Upload Photo (上传照片)
+### 7. Upload Photo
 
 Upload a new photo for a specific location.
 
@@ -369,7 +369,7 @@ fetch('http://127.0.0.1:8000/api/locations/1/photos/', {
 
 ---
 
-### 8. Delete Photo (删除照片)
+### 8. Delete Photo
 
 Delete a specific photo from a location.
 
