@@ -39,3 +39,61 @@ fetch('/api/locations/')
         });
       
     });
+
+var currentLocationMarker = null;
+
+document.getElementById('location-btn').addEventListener('click', function() {
+
+    if (!navigator.geolocation) {
+        alert('Geolocation is not supported by this browser.');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            console.log('Latitude:', latitude);
+            console.log('Longitude:', longitude);
+
+            if (currentLocationMarker) {
+                map.removeLayer(currentLocationMarker);
+            }
+
+            currentLocationMarker = L.marker([latitude, longitude])
+                .addTo(map)
+                .bindPopup('You are here!')
+                .openPopup();
+
+            map.setView([latitude, longitude], 15);
+
+            fetch('/api/locations/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'Current Location',
+                    country: '',
+                    city: '',
+                    latitude: latitude,
+                    longitude: longitude,
+                    visit_date: null,
+                    notes: 'Saved from current location'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            });
+        },
+
+        function(error) {
+            console.log(error);
+            alert('Unable to get your location.');
+        }
+    );
+
+});
