@@ -5,7 +5,7 @@ from django.shortcuts import render
 from .models import Location, Photo
 
 def main_map(request):
-    return render(request,'locations/Main_Map.html')
+    return render(request,'locations/Main-Map.html')
 
 def location_to_dict(location):
     """
