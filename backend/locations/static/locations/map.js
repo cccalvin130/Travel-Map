@@ -44,6 +44,10 @@ var currentLocationMarker = null;
 var currentLatitude = null;
 var currentLongitude = null;
 
+var selectedLocationMarker = null;
+var selectedLatitude = null;
+var selectedLongitude = null;
+
 document.getElementById('location-btn').addEventListener('click', function() {
 
     if (!navigator.geolocation) {
@@ -85,10 +89,19 @@ document.getElementById('location-btn').addEventListener('click', function() {
 
 document.getElementById('save-location-btn').addEventListener('click', function() {
 
-     if (currentLatitude === null || currentLongitude === null) {
-        alert('Please get your current location first.');
+    var latitude;
+    var longitude;
+
+    if (selectedLatitude !== null && selectedLongitude !== null) {
+        latitude = selectedLatitude;
+        longitude = selectedLongitude;
+    } else if (currentLatitude !== null && currentLongitude !== null) {
+        latitude = currentLatitude;
+        longitude = currentLongitude;
+    } else {
+        alert('Please get your current location or select a location on the map.');
         return;
-    }
+    } 
 
     var name = document.getElementById('location-name').value;
     var country = document.getElementById('country').value;
@@ -105,8 +118,8 @@ document.getElementById('save-location-btn').addEventListener('click', function(
             name: name,
             country: country,
             city: city,
-            latitude: currentLatitude,
-            longitude: currentLongitude,
+            latitude: latitude,
+            longitude: longitude,
             visit_date: visitDate || null,
             notes: notes
         })
@@ -116,5 +129,27 @@ document.getElementById('save-location-btn').addEventListener('click', function(
         console.log(data);
         alert('Location saved successfully!');
     });
+
+});
+
+map.on('click', function(event) {
+
+    var latitude = event.latlng.lat;
+    var longitude = event.latlng.lng;
+
+    selectedLatitude = latitude;
+    selectedLongitude = longitude;
+
+    console.log('Selected Latitude:', selectedLatitude);
+    console.log('Selected Longitude:', selectedLongitude);
+
+    if (selectedLocationMarker) {
+        map.removeLayer(selectedLocationMarker);
+    }
+
+    selectedLocationMarker = L.marker([selectedLatitude, selectedLongitude])
+        .addTo(map)
+        .bindPopup('Selected Location')
+        .openPopup();
 
 });
