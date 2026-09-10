@@ -7,8 +7,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from locations.views import main_map
 
-urlpatterns = [
+urlpatterns=[
+    path('', main_map, name='main-map'),
+
     # Django admin interface
     path('admin/', admin.site.urls),
 
