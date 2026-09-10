@@ -1,8 +1,11 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 from .models import Location, Photo
 
+def main_map(request):
+    return render(request,'locations/Main_Map.html')
 
 def location_to_dict(location):
     """
