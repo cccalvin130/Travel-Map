@@ -9,6 +9,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 fetch('/api/locations/')
     .then(response => response.json())
     .then(data => {
+
         var places = data.locations;
         places.forEach(function(place){
 
@@ -32,9 +33,17 @@ fetch('/api/locations/')
                 <p>${place.notes}</p>
             `;
 
-            L.marker([place.latitude, place.longitude])
+            var marker = L.marker([place.latitude, place.longitude])
                 .addTo(map)
                 .bindPopup(popupContent);
+
+            marker.on('click', function() {
+                savedLocationId = place.id;
+
+                console.log('Selected Location ID:', savedLocationId);
+
+                alert('Location selected: ' + place.name);
+            });
 
         });
       
@@ -47,6 +56,8 @@ var currentLongitude = null;
 var selectedLocationMarker = null;
 var selectedLatitude = null;
 var selectedLongitude = null;
+
+var savedLocationId = null;
 
 document.getElementById('location-btn').addEventListener('click', function() {
 
@@ -126,8 +137,16 @@ document.getElementById('save-location-btn').addEventListener('click', function(
     })
     .then(response => response.json())
     .then(data => {
+
         console.log(data);
+
+        savedLocationId = data.location.id;
+
+        console.log('Saved Location ID:', savedLocationId);
+
         alert('Location saved successfully!');
+
+        location.reload();
     });
 
 });
@@ -152,4 +171,47 @@ map.on('click', function(event) {
         .bindPopup('Selected Location')
         .openPopup();
 
+});
+
+document.getElementById('upload-photo-btn').addEventListener('click', function() {
+
+    if (savedLocationId === null) {
+        alert('Please select a location first.');
+        return;
+    }
+
+    var photoInput = document.getElementById('photo-input');
+
+    if (photoInput.files.length === 0) {
+        alert('Please select a photo.');
+        return;
+    }
+
+    var uploadRequests = [];
+
+    for (var i = 0; i < photoInput.files.length; i++) {
+
+        var formData = new FormData();
+        formData.append('image', photoInput.files[i]);
+
+        var uploadRequest = fetch('/api/locations/' + savedLocationId + '/photos/', {
+            method: 'POST',
+            body: formData
+        })
+        
+        .then(response => response.json());
+
+        uploadRequests.push(uploadRequest);
+    }
+
+    Promise.all(uploadRequests)
+        .then(function(results) {
+
+            console.log(results);
+
+            alert('All photos uploaded successfully!');
+
+            location.reload();
+
+        });
 });
