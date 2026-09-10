@@ -1,10 +1,5 @@
 ﻿__pycache__/
 *.py[cod]
 db.sqlite3
-db.sqlite3-journal
 media/
-.env
-.idea/
-.vscode/
-.DS_Store
-staticfiles/
+
