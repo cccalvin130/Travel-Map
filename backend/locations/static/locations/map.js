@@ -1,217 +1,143 @@
+// Get the map container
+const mapContainer = document.getElementById("map");
+
+// Create ECharts map
+const map = echarts.init(mapContainer);
 
 
-var map = L.map('map').setView([2.9278072, 101.6419120], 5);
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-fetch('/api/locations/')
+// Load world map data
+fetch("/static/locations/world.json")
     .then(response => response.json())
-    .then(data => {
+    .then(worldJson => {
 
-        var places = data.locations;
-        places.forEach(function(place){
+        // Register the world map
+        echarts.registerMap("world", worldJson);
 
-            var photos="";
 
-            if (place.photos){
-                place.photos.forEach(function(photo){
-                    photos +=   `<img src="${photo.image}" width="150">`;
+        // Get saved locations from Django Backend
+        return fetch("/api/locations/")
+            .then(response => response.json())
+            .then(data => {
+
+                const places = data.locations;
+
+                // Convert backend locations into ECharts data
+                const locationData = places.map(place => {
+
+                    return {
+                        name: place.name,
+
+                        value: [
+                            Number(place.longitude),
+                            Number(place.latitude)
+                        ],
+
+                        location: place
+                    };
+
                 });
-            }
 
-            var popupContent = `
-                <h3>${place.name}, ${place.city}, ${place.country}</h3>
 
-                ${photos}
+                // Display the map
+                map.setOption({
 
-                <p>Latitude: ${place.latitude}</p>
-                <p>Longitude: ${place.longitude}</p>
+                    title: {
+                        text: "My Travel Map",
+                        left: "center"
+                    },
 
-                <p>Visited: ${place.visit_date}</p>
-                <p>${place.notes}</p>
-            `;
 
-            var marker = L.marker([place.latitude, place.longitude])
-                .addTo(map)
-                .bindPopup(popupContent);
+                    tooltip: {
+                        trigger: "item",
 
-            marker.on('click', function() {
-                savedLocationId = place.id;
+                        formatter: function (params) {
 
-                console.log('Selected Location ID:', savedLocationId);
+                            // Country hover
+                            if (!params.data || !params.data.location) {
+                                return params.name;
+                            }
 
-                alert('Location selected: ' + place.name);
+                            // Location marker
+                            const place = params.data.location;
+
+                            return `
+                                <b>${place.name}</b><br>
+                                ${place.city}, ${place.country}<br>
+                                Latitude: ${place.latitude}<br>
+                                Longitude: ${place.longitude}
+                            `;
+                        }
+                    },
+
+
+                    geo: {
+                        map: "world",
+                        roam: true,
+
+                        itemStyle: {
+                            areaColor: "#e6e6e6",
+                            borderColor: "#888"
+                        },
+
+                        emphasis: {
+                            itemStyle: {
+                                areaColor: "#cfcfcf"
+                            }
+                        }
+                    },
+
+
+                    // Travel location markers
+                    series: [
+
+                        {
+                            name: "Travel Locations",
+
+                            type: "scatter",
+
+                            coordinateSystem: "geo",
+
+                            data: locationData,
+
+                            symbol: "pin",
+
+                            symbolSize: 35
+                        }
+
+                    ]
+
+                });
+
             });
 
-        });
-      
+    })
+    .catch(error => {
+
+        console.error("Failed to load map or locations:", error);
+
     });
 
-var currentLocationMarker = null;
-var currentLatitude = null;
-var currentLongitude = null;
 
-var selectedLocationMarker = null;
-var selectedLatitude = null;
-var selectedLongitude = null;
+// Make the map responsive
+window.addEventListener("resize", function () {
+    map.resize();
+});
 
-var savedLocationId = null;
+// Select a location by clicking on the map
+map.on("click", function (params) {
 
-document.getElementById('location-btn').addEventListener('click', function() {
+    // Get the clicked position
+    const pointInPixel = [params.event.offsetX, params.event.offsetY];
 
-    if (!navigator.geolocation) {
-        alert('Geolocation is not supported by this browser.');
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-            currentLatitude = latitude;
-            currentLongitude = longitude;
-
-            console.log('Latitude:', latitude);
-            console.log('Longitude:', longitude);
-
-            if (currentLocationMarker) {
-                map.removeLayer(currentLocationMarker);
-            }
-
-            currentLocationMarker = L.marker([latitude, longitude])
-                .addTo(map)
-                .bindPopup('You are here!')
-                .openPopup();
-
-            map.setView([latitude, longitude], 15);
-        },
-
-        function(error) {
-            console.log(error);
-            alert('Unable to get your location.');
-        }
+    const pointInGeo = map.convertFromPixel(
+        { geoIndex: 0 },
+        pointInPixel
     );
 
-});
+    const longitude = pointInGeo[0];
+    const latitude = pointInGeo[1];
 
-document.getElementById('save-location-btn').addEventListener('click', function() {
+    console.log("Selected Latitude:", latitude);
+    console.log("Selected Longitude:", longitude);
 
-    var latitude;
-    var longitude;
-
-    if (selectedLatitude !== null && selectedLongitude !== null) {
-        latitude = selectedLatitude;
-        longitude = selectedLongitude;
-    } else if (currentLatitude !== null && currentLongitude !== null) {
-        latitude = currentLatitude;
-        longitude = currentLongitude;
-    } else {
-        alert('Please get your current location or select a location on the map.');
-        return;
-    } 
-
-    var name = document.getElementById('location-name').value;
-    var country = document.getElementById('country').value;
-    var city = document.getElementById('city').value;
-    var visitDate = document.getElementById('visit-date').value;
-    var notes = document.getElementById('notes').value;
-
-    fetch('/api/locations/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: name,
-            country: country,
-            city: city,
-            latitude: latitude,
-            longitude: longitude,
-            visit_date: visitDate || null,
-            notes: notes
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        console.log(data);
-
-        savedLocationId = data.location.id;
-
-        console.log('Saved Location ID:', savedLocationId);
-
-        alert('Location saved successfully!');
-
-        location.reload();
-    });
-
-});
-
-map.on('click', function(event) {
-
-    var latitude = event.latlng.lat;
-    var longitude = event.latlng.lng;
-
-    selectedLatitude = latitude;
-    selectedLongitude = longitude;
-
-    console.log('Selected Latitude:', selectedLatitude);
-    console.log('Selected Longitude:', selectedLongitude);
-
-    if (selectedLocationMarker) {
-        map.removeLayer(selectedLocationMarker);
-    }
-
-    selectedLocationMarker = L.marker([selectedLatitude, selectedLongitude])
-        .addTo(map)
-        .bindPopup('Selected Location')
-        .openPopup();
-
-});
-
-document.getElementById('upload-photo-btn').addEventListener('click', function() {
-
-    if (savedLocationId === null) {
-        alert('Please select a location first.');
-        return;
-    }
-
-    var photoInput = document.getElementById('photo-input');
-
-    if (photoInput.files.length === 0) {
-        alert('Please select a photo.');
-        return;
-    }
-
-    var uploadRequests = [];
-
-    for (var i = 0; i < photoInput.files.length; i++) {
-
-        var formData = new FormData();
-        formData.append('image', photoInput.files[i]);
-
-        var uploadRequest = fetch('/api/locations/' + savedLocationId + '/photos/', {
-            method: 'POST',
-            body: formData
-        })
-        
-        .then(response => response.json());
-
-        uploadRequests.push(uploadRequest);
-    }
-
-    Promise.all(uploadRequests)
-        .then(function(results) {
-
-            console.log(results);
-
-            alert('All photos uploaded successfully!');
-
-            location.reload();
-
-        });
 });
