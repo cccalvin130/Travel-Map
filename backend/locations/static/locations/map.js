@@ -2,8 +2,8 @@
 
 var map = L.map('map').setView([2.9278072, 101.6419120], 5);
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team'
 }).addTo(map);
 
 fetch('/api/locations/')
@@ -11,7 +11,34 @@ fetch('/api/locations/')
     .then(data => {
 
         var places = data.locations;
+        var history = document.getElementById('travel-history');
         places.forEach(function(place){
+
+            history.innerHTML += `
+                <div id="history-${place.id}"> 
+                    <h3>${place.name}</h3>
+                    <p>${place.city}, ${place.country}</p>
+                    <p>Visited: ${place.visit_date}</p>
+                    <p>${place.notes}</p>
+                </div>
+            `;
+        });    
+
+        places.forEach(function(place) {
+
+            document.getElementById(`history-${place.id}`).addEventListener('click', function() {
+
+                map.setView([place.latitude, place.longitude], 15);
+
+                document.getElementById('map').scrollIntoView({
+                    behavior: 'smooth'
+                });
+
+            });
+
+        });
+
+         places.forEach(function(place) {
 
             var photos="";
 
