@@ -2,8 +2,8 @@
 
 var map = L.map('map').setView([2.9278072, 101.6419120], 5);
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team'
 }).addTo(map);
 
 fetch('/api/locations/')
