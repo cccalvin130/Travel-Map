@@ -12,14 +12,13 @@ fetch('/api/locations/')
 
         var places = data.locations;
         var history = document.getElementById('travel-history');
+        var markers = {};
         places.forEach(function(place){
 
             history.innerHTML += `
                 <div id="history-${place.id}"> 
                     <h3>${place.name}</h3>
                     <p>${place.city}, ${place.country}</p>
-                    <p>Visited: ${place.visit_date}</p>
-                    <p>${place.notes}</p>
                 </div>
             `;
         });    
@@ -28,7 +27,14 @@ fetch('/api/locations/')
 
             document.getElementById(`history-${place.id}`).addEventListener('click', function() {
 
+                savedLocationId = place.id;
+
+                selectedLatitude = place.latitude;
+                selectedLongitude = place.longitude;
+
                 map.setView([place.latitude, place.longitude], 15);
+
+                markers[place.id].openPopup();
 
                 document.getElementById('map').scrollIntoView({
                     behavior: 'smooth'
@@ -44,7 +50,20 @@ fetch('/api/locations/')
 
             if (place.photos){
                 place.photos.forEach(function(photo){
-                    photos +=   `<img src="${photo.image}" width="150">`;
+
+                    photos += `
+                        <div>
+                            <img src="${photo.image}" width="150">
+                            <br>
+                            <button 
+                                class="delete-photo-btn" 
+                                data-photo-id="${photo.id}"
+                                data-location-id="${place.id}">
+                                Delete Photo
+                            </button>
+                        </div>
+                    `;
+
                 });
             }
 
@@ -64,10 +83,23 @@ fetch('/api/locations/')
                 .addTo(map)
                 .bindPopup(popupContent);
 
+            markers[place.id] = marker;    
+
             marker.on('click', function() {
                 savedLocationId = place.id;
 
+                selectedLatitude = place.latitude;
+                selectedLongitude = place.longitude;
+
                 console.log('Selected Location ID:', savedLocationId);
+                console.log('Selected Latitude:', selectedLatitude);
+                console.log('Selected Longitude:', selectedLongitude);
+
+                document.getElementById('location-name').value = place.name;
+                document.getElementById('country').value = place.country;
+                document.getElementById('city').value = place.city;
+                document.getElementById('visit-date').value = place.visit_date;
+                document.getElementById('notes').value = place.notes;
 
                 alert('Location selected: ' + place.name);
             });
@@ -98,6 +130,14 @@ document.getElementById('location-btn').addEventListener('click', function() {
 
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
+
+            savedLocationId = null;
+
+            document.getElementById('location-name').value = '';
+            document.getElementById('country').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('visit-date').value = '';
+            document.getElementById('notes').value = '';
 
             currentLatitude = latitude;
             currentLongitude = longitude;
@@ -147,21 +187,26 @@ document.getElementById('save-location-btn').addEventListener('click', function(
     var visitDate = document.getElementById('visit-date').value;
     var notes = document.getElementById('notes').value;
 
-    fetch('/api/locations/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: name,
-            country: country,
-            city: city,
-            latitude: latitude,
-            longitude: longitude,
-            visit_date: visitDate || null,
-            notes: notes
-        })
-    })
+    fetch(
+        savedLocationId === null
+            ? '/api/locations/'
+            : '/api/locations/' + savedLocationId + '/',
+        {
+            method: savedLocationId === null ? 'POST' : 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                country: country,
+                city: city,
+                latitude: latitude,
+                longitude: longitude,
+                visit_date: visitDate || null,
+                notes: notes
+            })
+        }
+    )
     .then(response => response.json())
     .then(data => {
 
@@ -183,9 +228,18 @@ map.on('click', function(event) {
     var latitude = event.latlng.lat;
     var longitude = event.latlng.lng;
 
+    savedLocationId = null;
+
     selectedLatitude = latitude;
     selectedLongitude = longitude;
 
+    document.getElementById('location-name').value = '';
+    document.getElementById('country').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('visit-date').value = '';
+    document.getElementById('notes').value = '';
+
+    console.log('New location selected');
     console.log('Selected Latitude:', selectedLatitude);
     console.log('Selected Longitude:', selectedLongitude);
 
@@ -241,4 +295,64 @@ document.getElementById('upload-photo-btn').addEventListener('click', function()
             location.reload();
 
         });
+});
+
+document.getElementById('delete-location-btn').addEventListener('click', function() {
+
+    if (savedLocationId === null) {
+        alert('Please select a location first!');
+        return;
+    }
+
+    var confirmed = confirm('Are you sure you want to delete this location?');
+
+    if (!confirmed) {
+        return;
+    }
+
+    fetch('/api/locations/' + savedLocationId + '/', {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        console.log(data);
+
+        alert('Location deleted successfully!');
+
+        location.reload();
+
+    });
+
+});
+
+document.addEventListener('click', function(event) {
+
+    if (event.target.classList.contains('delete-photo-btn')) {
+
+        var photoId = event.target.dataset.photoId;
+        var locationId = event.target.dataset.locationId;
+
+        var confirmed = confirm('Are you sure you want to delete this photo?');
+
+        if (!confirmed) {
+            return;
+        }
+
+        fetch('/api/locations/' + locationId + '/photos/' + photoId + '/', {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            console.log(data);
+
+            alert('Photo deleted successfully!');
+
+            location.reload();
+
+        });
+
+    }
+
 });
