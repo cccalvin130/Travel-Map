@@ -53,7 +53,7 @@ fetch('/api/locations/')
 
                     photos += `
                         <div>
-                            <img src="${photo.image}" width="150">
+                            <img src="${photo.image}" width="150" class="photo-preview">
                             <br>
                             <button 
                                 class="delete-photo-btn" 
@@ -87,6 +87,8 @@ fetch('/api/locations/')
 
             marker.on('click', function() {
                 savedLocationId = place.id;
+
+                document.getElementById('save-location-btn').textContent = 'Update Location';
 
                 selectedLatitude = place.latitude;
                 selectedLongitude = place.longitude;
@@ -132,6 +134,7 @@ document.getElementById('location-btn').addEventListener('click', function() {
             var longitude = position.coords.longitude;
 
             savedLocationId = null;
+            document.getElementById('save-location-btn').textContent = 'Save Location';
 
             document.getElementById('location-name').value = '';
             document.getElementById('country').value = '';
@@ -229,6 +232,7 @@ map.on('click', function(event) {
     var longitude = event.latlng.lng;
 
     savedLocationId = null;
+    document.getElementById('save-location-btn').textContent = 'Save Location';
 
     selectedLatitude = latitude;
     selectedLongitude = longitude;
@@ -294,7 +298,14 @@ document.getElementById('upload-photo-btn').addEventListener('click', function()
 
             location.reload();
 
-        });
+        })
+
+        .catch(function(error) {
+
+        console.log(error);
+
+        alert('Some photos failed to upload.');
+    });
 });
 
 document.getElementById('delete-location-btn').addEventListener('click', function() {
@@ -352,6 +363,30 @@ document.addEventListener('click', function(event) {
             location.reload();
 
         });
+
+    }
+
+});
+
+document.addEventListener('click', function(event) {
+
+    if (event.target.classList.contains('photo-preview')) {
+
+        var imageUrl = event.target.src;
+
+        var previewWindow = window.open('', '_blank');
+
+        previewWindow.document.write(`
+            <html>
+                <head>
+                    <title>Photo Preview</title>
+                </head>
+
+                <body style="margin: 0; text-align: center;">
+                    <img src="${imageUrl}" style="max-width: 100%; max-height: 100vh;">
+                </body>
+            </html>
+        `);
 
     }
 
