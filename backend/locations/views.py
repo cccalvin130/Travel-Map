@@ -1,11 +1,66 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.models import User
 from .models import Location, Photo
 
 def main_map(request):
-    return render(request,'locations/Main-Map.html')
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    return render(request, 'locations/Main-Map.html')
+
+def login_page(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
+
+        if user is not None:
+            login(request, user)
+            return redirect('main-map')
+
+        return render(
+            request,
+            'locations/LoginPage.html',
+            {'error': 'Invalid username or password.'}
+        )
+
+    return render(request, 'locations/LoginPage.html')
+
+def register_page(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if User.objects.filter(username=username).exists():
+            return render(
+                request,
+                'locations/LoginPage.html',
+                {'register_error': 'Username already exists.'}
+            )
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return redirect('login')
+
+    return render(request, 'locations/LoginPage.html')
+
+def logout_page(request):
+    logout(request)
+    return redirect('login')
 
 def location_to_dict(location):
     """
@@ -58,7 +113,7 @@ def location_list(request):
 
     if request.method == 'GET':
         # Get all locations from the database
-        all_locations = Location.objects.all()
+        all_locations = Location.objects.filter(user=request.user)
 
         # Convert each location to a dictionary and add to a list
         result = []
@@ -86,6 +141,7 @@ def location_list(request):
 
         # Create a new location and save to database
         new_location = Location.objects.create(
+            user=request.user,
             name=name,
             country=country,
             city=city,
@@ -113,7 +169,10 @@ def location_detail(request, location_id):
     """
 
     # Find location by id, returns None if not found
-    location = Location.objects.filter(id=location_id).first()
+    location = Location.objects.filter(
+        id=location_id,
+        user=request.user
+    ).first()
 
     # Return error if location not found
     if not location:
@@ -169,7 +228,11 @@ def photo_list(request, location_id):
     """
 
     # First find the location
-    location = Location.objects.filter(id=location_id).first()
+    location = Location.objects.filter(
+        id=location_id,
+        user=request.user
+    ).first()
+
     if not location:
         return JsonResponse({'error': 'Location not found'}, status=404)
 
@@ -223,7 +286,11 @@ def photo_detail(request, location_id, photo_id):
     """
 
     # First find the location
-    location = Location.objects.filter(id=location_id).first()
+    location = Location.objects.filter(
+        id=location_id,
+        user=request.user
+    ).first()
+    
     if not location:
         return JsonResponse({'error': 'Location not found'}, status=404)
 
