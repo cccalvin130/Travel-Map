@@ -2,90 +2,59 @@
 
 <!DOCTYPE html>
 <html>
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
     <title>My Travel Map</title>
-
-    <link rel="stylesheet"
-          href="{% static 'locations/style.css' %}">
-
-    <!-- ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js"></script>
-
+    <link rel="stylesheet" href="{% static 'locations/style.css' %}">
+    <link 
+    rel="stylesheet" 
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
 </head>
 
 <body>
 
-    <header>
+    <h1> My Travel Map</h1>
 
-        <h1>My Travel Map</h1>
+   <a href="{% url 'logout' %}"
+   id="logout-btn"
+   style="display: inline-block; padding: 10px 18px; background: white; color: #88B9E6; border: 2px solid #88B9E6; border-radius: 8px; text-decoration: none;">
+   Logout
+</a>
 
-    </header>
+    <button id="location-btn"> My Current Location</button>
 
+    <div>
+        <input id="location-name" type="text" placeholder="Location Name">
 
-    <main>
+        <input id="country" type="text" placeholder="Country">
 
-        <!-- Current location -->
+        <input id="city" type="text" placeholder="City">
 
-        <button id="location-btn">
-            📍 My Current Location
-        </button>
+        <input id="visit-date" type="date">
 
+        <textarea id="notes" placeholder="Notes"></textarea>
 
-        <!-- Add Location -->
+        <button id="save-location-btn">Save Location</button>
 
-        <section class="location-form">
+        <button id="delete-location-btn">Delete Location</button>
 
-            <input
-                id="location-name"
-                type="text"
-                placeholder="Location Name"
-            >
+        <input id="photo-input" type="file" accept="image/*" multiple>
 
-            <input
-                id="country"
-                type="text"
-                placeholder="Country"
-            >
+        <button id="upload-photo-btn">Upload Photo</button>
+    </div>
 
-            <input
-                id="city"
-                type="text"
-                placeholder="City"
-            >
+    <div id="map"></div>
 
-            <input
-                id="visit-date"
-                type="date"
-            >
+    <h2>Travel History</h2>
 
-            <textarea
-                id="notes"
-                placeholder="Notes"
-            ></textarea>
+    <div id="travel-history"></div>
 
-            <button id="save-location-btn">
-                Save Location
-            </button>
-
-        </section>
-
-
-        <!-- ECharts Map -->
-
-        <div id="map"></div>
-
-    </main>
-
+    <script 
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    >
+    </script>
 
     <script src="{% static 'locations/map.js' %}"></script>
 
 </body>
-
 </html>

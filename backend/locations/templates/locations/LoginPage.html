@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'locations/LoginPage.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-box">
+            <!--Register Box-->
+            <div class="register-box hidden">
+                <h1>Register</h1>
+                <form method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    
+                    <input type="text"
+                    name="username"
+                    placeholder="Username"
+                    required>
+                    
+                    <input type="email"
+                    name="email"
+                    placeholder="Email"
+                    required>
+                    
+                    <input type="password"
+                    name="password"
+                    placeholder="Password"
+                    required>
+                    
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+            
+            <!--Login Box-->
+            <div class="login-box">
+                <h1>Login</h1>
+                
+                <form method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <input type="text"
+                    name="username"
+                    placeholder="Username"
+                    required>
+                    
+                    <input type="password"
+                    name="password"
+                    placeholder="Password"
+                    required>
+                    
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+        <div class="con-box left">
+            <h2>Welcome to Our App</h2>
+            <p>Already have an account?</p>
+            <button id="login">Login</button>
+        </div>
+        <div class="con-box right">
+            <h2>Welcome to Our App</h2>
+            <p>Don't have an account?</p>
+            <button id="register">Register</button>
+        </div>
+    </div>
+    <script>
+        let login = document.getElementById('login');
+        let register = document.getElementById('register');
+        let form_box = document.getElementsByClassName('form-box')[0];
+        let register_box = document.getElementsByClassName('register-box')[0];
+        let login_box = document.getElementsByClassName('login-box')[0];
+
+        register.addEventListener('click', () => {
+            form_box.style.transform = 'translateX(80%)';
+            register_box.classList.remove('hidden');
+            login_box.classList.add('hidden');
+        })
+
+        login.addEventListener('click', () => {
+            form_box.style.transform = 'translateX(0%)';
+            register_box.classList.add('hidden');
+            login_box.classList.remove('hidden');
+        })
+    </script>
+</body>
+</html>

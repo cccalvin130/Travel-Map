@@ -1,4 +1,861 @@
+/* =========================
+   General Page
+========================= */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f7fcff;
+    color: #333;
+}
+
+
+/* =========================
+   Page Title
+========================= */
+
+h1 {
+    text-align: center;
+    margin: 0;
+    padding: 25px;
+    background-color: white;
+    color: #333;
+    font-size: 32px;
+}
+
+
+/* =========================
+   Main Content
+========================= */
+
+body > div,
+body > button,
+body > h2,
+body > #map {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* =========================
+   Current Location Button
+========================= */
+
+#location-btn {
+    display: block;
+    margin: 25px auto 20px auto;
+
+    padding: 12px 22px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #9dbfeb;
+    color: white;
+
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#location-btn:hover {
+    background-color: #70a0df;
+}
+
+
+/* =========================
+   Location Form
+========================= */
+
+body > div:not(#map):not(#travel-history) {
+    width: 90%;
+    max-width: 1200px;
+    margin-bottom: 25px;
+
+    padding: 20px;
+
+    background-color: white;
+
+    border-radius: 12px;
+
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.23);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   Inputs
+========================= */
+
+input,
+textarea {
+    padding: 10px;
+
+    margin: 5px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+}
+
+textarea {
+    min-height: 45px;
+    resize: vertical;
+}
+
+
+/* =========================
+   Form Buttons
+========================= */
+
+#save-location-btn,
+#delete-location-btn,
+#upload-photo-btn {
+    padding: 10px 16px;
+
+    margin: 5px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+#save-location-btn {
+    background-color: #9dbfeb;
+    color: white;
+}
+
+#save-location-btn:hover {
+    background-color: #34ae38;
+}
+
+#delete-location-btn {
+    background-color: #9dbfeb;
+    color: white;
+}
+
+#delete-location-btn:hover {
+    background-color: #c3323e;
+}
+
+#upload-photo-btn {
+    background-color: #9dbfeb;
+    color: white;
+}
+
+#upload-photo-btn:hover {
+    background-color: #b69cd2;
+}
+
+
+/* =========================
+   Map
+========================= */
+
 #map {
     height: 650px;
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 25px auto;
+
+    border-radius: 15px;
+
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.23);
+}
+
+/* =========================
+   Leaflet Map Styling
+========================= */
+
+#map {
+    overflow: hidden;
+}
+
+/* Zoom buttons */
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-control-zoom a {
+    width: 38px !important;
+    height: 38px !important;
+    line-height: 38px !important;
+
+    font-size: 20px !important;
+
+    color: #333 !important;
+    background-color: white !important;
+
+    border: none !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background-color: #f0f4f8 !important;
+}
+
+
+/* Popup */
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.18);
+}
+
+.leaflet-popup-content {
+    margin: 15px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.leaflet-popup-tip {
+    box-shadow: none;
+}
+
+
+/* Marker popup title */
+.leaflet-popup-content strong {
+    font-size: 17px;
+    color: #333;
+}
+
+/* =========================
+   Travel Location Popup
+========================= */
+
+.leaflet-popup-content {
+    min-width: 220px;
+}
+
+/* Location name */
+.leaflet-popup-content strong {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #2c3e50;
+}
+
+/* Popup information */
+.leaflet-popup-content {
+    color: #555;
+}
+
+.leaflet-popup-content br {
+    line-height: 1.8;
+}
+
+
+/* Popup links / buttons if used */
+.leaflet-popup-content button {
+    margin-top: 8px;
+
+    padding: 7px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #4a90e2;
+    color: white;
+
+    cursor: pointer;
+}
+
+.leaflet-popup-content button:hover {
+    background-color: #357abd;
+}
+
+/* =========================
+   Travel History
+========================= */
+
+h2 {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 35px auto 15px auto;
+
+    text-align: center;
+}
+
+#travel-history {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 0 auto 40px auto;
+}
+
+#travel-history > div {
+    background-color: white;
+
+    padding: 15px 20px;
+
+    margin-bottom: 10px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+#travel-history > div:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+#travel-history h3 {
+    margin: 0 0 5px 0;
+}
+
+#travel-history p {
+    margin: 0;
+
+    color: #666;
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 768px) {
+
+    #map {
+        width: 95%;
+        height: 500px;
+    }
+
+    body > div:not(#map):not(#travel-history) {
+        width: 95%;
+    }
+
+    input,
+    textarea {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    #save-location-btn,
+    #delete-location-btn,
+    #upload-photo-btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+/* =========================
+   Travel Popup Card
+========================= */
+
+.leaflet-popup-content-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 4px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.leaflet-popup-content {
+    min-width: 230px;
+    margin: 16px;
+    font-family: Arial, sans-serif;
+    color: #555;
+    line-height: 1.7;
+}
+
+/* Location name */
+.leaflet-popup-content strong {
+    display: block;
+    margin-bottom: 12px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #2c3e50;
+}
+
+/* Popup information */
+.leaflet-popup-content br {
+    line-height: 2;
+}
+
+/* Popup close button */
+.leaflet-popup-close-button {
+    color: #777 !important;
+    font-size: 20px !important;
+    padding: 8px !important;
+}
+
+.leaflet-popup-close-button:hover {
+    color: #333 !important;
+}
+
+/* =========================
+   Travel History Cards
+========================= */
+
+#travel-history {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto 50px auto;
+}
+
+/* Each travel record */
+#travel-history > div {
+    position: relative;
+
+    background: white;
+
+    padding: 20px 24px;
+    margin-bottom: 15px;
+
+    border-radius: 14px;
+
+    border: 1px solid #eef1f5;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+    transition: all 0.2s ease;
+}
+
+/* Hover effect */
+#travel-history > div:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+}
+
+/* Location name */
+#travel-history h3 {
+    margin: 0 0 8px 0;
+
+    font-size: 19px;
+
+    color: #2c3e50;
+}
+
+/* Information */
+#travel-history p {
+    margin: 5px 0;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+/* Date */
+#travel-history p:last-child {
+    color: #4a90e2;
+    font-weight: 600;
+}
+
+/* =========================
+   Travel Map Header
+========================= */
+
+h1 {
+    margin: 0;
+    padding: 28px 20px;
+
+    text-align: center;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    color: #ffffff;
+
+    background: #9dbfeb;
+
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    letter-spacing: 1px;
+}
+
+/* =========================
+   Travel Map Buttons
+========================= */
+
+/* Current Location */
+#location-btn {
+    display: block;
+
+    margin: 25px auto 20px auto;
+
+    padding: 12px 24px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #9dbfeb;
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+#location-btn:hover {
+    background: #70a0df;
+    transform: translateY(-2px);
+}
+
+
+/* Save Location */
+#save-location-btn {
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #9dbfeb;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+#save-location-btn:hover {
+    background: #34a138;
+    transform: translateY(-2px);
+}
+
+
+/* Delete Location */
+#delete-location-btn {
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #9dbfeb;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+/* Upload Photo */
+#upload-photo-btn {
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #9dbfeb;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+/* Button hover */
+#delete-location-btn:hover,
+#upload-photo-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* =========================
+   Travel Form Inputs
+========================= */
+
+input,
+textarea {
+    padding: 11px 13px;
+
+    margin: 5px;
+
+    border: 1px solid #d9dee5;
+    border-radius: 8px;
+
+    background: #fafbfc;
+
+    color: #333;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: all 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+
+/* When clicking an input */
+input:focus,
+textarea:focus {
+    background: white;
+
+    border-color: #4a90e2;
+
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.12);
+}
+
+
+/* Placeholder text */
+input::placeholder,
+textarea::placeholder {
+    color: #9aa3ad;
+}
+
+
+/* Notes */
+textarea {
+    min-height: 80px;
+
+    resize: vertical;
+}
+
+/* =========================
+   Photo Section
+========================= */
+
+input[type="file"] {
     width: 100%;
+    max-width: 400px;
+
+    padding: 10px;
+
+    margin: 10px 0;
+
+    border: 2px dashed #d9dee5;
+    border-radius: 10px;
+
+    background: #fafbfc;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition: all 0.2s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #4a90e2;
+    background: #f5f9ff;
+}
+
+
+/* Photo preview / photo list */
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+/* Images inside travel records */
+
+#travel-history img {
+    width: 180px;
+    height: 120px;
+
+    object-fit: cover;
+
+    margin: 8px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+
+    transition: transform 0.2s ease;
+}
+
+#travel-history img:hover {
+    transform: scale(1.03);
+}
+
+/* =========================
+   Mobile Responsive Design
+========================= */
+
+@media (max-width: 768px) {
+
+    /* Header */
+    h1 {
+        padding: 20px 10px;
+        font-size: 25px;
+    }
+
+    /* Main form */
+    body > div:not(#map):not(#travel-history) {
+        width: 94%;
+        padding: 15px;
+    }
+
+    /* Inputs */
+    input,
+    textarea {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    /* Buttons */
+    #location-btn,
+    #save-location-btn,
+    #delete-location-btn,
+    #upload-photo-btn {
+        width: 100%;
+        margin: 6px 0;
+    }
+
+    /* Map */
+    #map {
+        width: 94%;
+        height: 450px;
+        margin: 20px auto;
+    }
+
+    /* Travel History */
+    #travel-history {
+        width: 94%;
+    }
+
+    #travel-history > div {
+        padding: 15px;
+    }
+
+    /* Travel photos */
+    #travel-history img {
+        width: 100%;
+        height: auto;
+        margin: 5px 0;
+    }
+
+    /* Popup */
+    .leaflet-popup-content {
+        min-width: 180px;
+        max-width: 240px;
+    }
+}
+
+/* =========================
+   Location Form - Clean Layout
+========================= */
+
+body > div:not(#map):not(#travel-history) {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 25px auto;
+
+    padding: 25px;
+
+    background: white;
+
+    border-radius: 15px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+    box-sizing: border-box;
+}
+
+
+/* Form inputs */
+
+#location-name,
+#country,
+#city,
+#visit-date {
+    width: 21%;
+
+    height: 45px;
+
+    margin: 5px;
+
+    box-sizing: border-box;
+}
+
+
+/* Notes */
+
+#notes {
+    width: 22%;
+
+    height: 90px;
+
+    margin: 5px;
+
+    vertical-align: top;
+
+    box-sizing: border-box;
+}
+
+
+/* File input */
+
+#photo-input {
+    width: 30%;
+
+    height: 45px;
+
+    margin: 5px;
+
+    box-sizing: border-box;
+}
+
+/* =========================
+   Location Form Title
+========================= */
+
+body > div:first-of-type::before {
+    content: "📍  Add Travel Location";
+
+    display: block;
+
+    margin-bottom: 18px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #2c3e50;
+}
+
+#logout-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    margin: 10px;
+    background-color: #ffffff;
+    color: #88B9E6;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+#logout-btn:hover {
+    background-color: #88B9E6;
+    color: #ffffff;
 }
