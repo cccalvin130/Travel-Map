@@ -179,6 +179,31 @@ document.getElementById('location-btn').addEventListener('click', function() {
 
 });
 
+function uploadSelectedPhotos(locationId) {
+    var photoInput = document.getElementById('photo-input');
+
+    if (photoInput.files.length === 0) {
+        return Promise.resolve();
+    }
+
+    var uploadRequests = [];
+
+    for (var i = 0; i < photoInput.files.length; i++) {
+        var formData = new FormData();
+        formData.append('image', photoInput.files[i]);
+
+        var uploadRequest = fetch('/api/locations/' + locationId + '/photos/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json());
+
+        uploadRequests.push(uploadRequest);
+    }
+
+    return Promise.all(uploadRequests);
+}
+
 document.getElementById('save-location-btn').addEventListener('click', function() {
 
     var latitude;
@@ -230,9 +255,16 @@ document.getElementById('save-location-btn').addEventListener('click', function(
 
         console.log('Saved Location ID:', savedLocationId);
 
-        alert('Location saved successfully!');
+        return uploadSelectedPhotos(savedLocationId);
+    })
 
+    .then(function() {
+        alert('Location saved successfully!');
         location.reload();
+    })
+    .catch(function(error) {
+        console.log(error);
+        alert('Location was saved, but photo upload failed.');
     });
 
 });
@@ -352,6 +384,8 @@ document.addEventListener('click', function(event) {
 
     if (event.target.classList.contains('delete-photo-btn')) {
 
+        var button = event.target;
+
         var photoId = event.target.dataset.photoId;
         var locationId = event.target.dataset.locationId;
 
@@ -371,7 +405,14 @@ document.addEventListener('click', function(event) {
 
             alert('Photo deleted successfully!');
 
-            location.reload();
+            button.closest('div').remove();
+
+        })
+        .catch(function(error) {
+
+            console.log(error);
+
+            alert('Failed to delete photo.');
 
         });
 
