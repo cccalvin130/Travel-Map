@@ -59,23 +59,24 @@ fetch('/api/locations/')
 
             var photos="";
 
-            if (place.photos){
+            if (place.photos && place.photos.length > 0){
+                photos = '<div class="photo-grid">';
                 place.photos.forEach(function(photo){
 
                     photos += `
-                        <div>
-                            <img src="${photo.image}" width="150" class="photo-preview">
-                            <br>
+                        <div class="photo-item">
+                            <img src="${photo.image}" class="photo-preview">
                             <button 
                                 class="delete-photo-btn" 
                                 data-photo-id="${photo.id}"
                                 data-location-id="${place.id}">
-                                Delete Photo
+                                Delete
                             </button>
                         </div>
                     `;
 
                 });
+                photos += '</div>';
             }
 
             var popupContent = `
