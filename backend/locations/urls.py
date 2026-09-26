@@ -23,4 +23,7 @@ urlpatterns = [
 
     # Single photo: delete a photo
     path('locations/<int:location_id>/photos/<int:photo_id>/', views.photo_detail, name='photo-detail'),
+
+    # User profile stats: get user's travel statistics
+    path('profile/', views.profile_stats, name='profile-stats'),
 ]

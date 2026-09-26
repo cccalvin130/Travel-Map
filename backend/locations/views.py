@@ -112,8 +112,27 @@ def location_list(request):
     """
 
     if request.method == 'GET':
-        # Get all locations from the database
+        # Get all locations from the database (only current user's)
         all_locations = Location.objects.filter(user=request.user)
+
+        # === Search and filter features ===
+        # ?search=keyword - search by location name
+        search_keyword = request.GET.get('search')
+        if search_keyword:
+            all_locations = all_locations.filter(name__icontains=search_keyword)
+
+        # ?country=Malaysia - filter by country
+        country_filter = request.GET.get('country')
+        if country_filter:
+            all_locations = all_locations.filter(country=country_filter)
+
+        # ?city=Kuala Lumpur - filter by city
+        city_filter = request.GET.get('city')
+        if city_filter:
+            all_locations = all_locations.filter(city=city_filter)
+
+        # Order by visit date (newest first), if no date then by created date
+        all_locations = all_locations.order_by('-visit_date', '-created_at')
 
         # Convert each location to a dictionary and add to a list
         result = []
@@ -303,3 +322,35 @@ def photo_detail(request, location_id, photo_id):
         # Delete the photo
         photo.delete()
         return JsonResponse({'message': 'Photo deleted successfully'})
+
+
+@csrf_exempt
+def profile_stats(request):
+    """
+    Profile stats API endpoint
+    URL: /api/profile/
+    GET = get user's travel statistics
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not logged in'}, status=401)
+
+    # Get all locations for current user
+    user_locations = Location.objects.filter(user=request.user)
+
+    # Count statistics
+    total_locations = user_locations.count()
+    total_countries = user_locations.values('country').distinct().count()
+    total_cities = user_locations.values('city').distinct().count()
+
+    # Count all photos across all user's locations
+    total_photos = Photo.objects.filter(location__user=request.user).count()
+
+    # Return stats to frontend
+    return JsonResponse({
+        'username': request.user.username,
+        'email': request.user.email,
+        'total_locations': total_locations,
+        'total_countries': total_countries,
+        'total_cities': total_cities,
+        'total_photos': total_photos,
+    })
