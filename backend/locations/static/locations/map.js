@@ -17,110 +17,111 @@ L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team'
 }).addTo(map);
 
-fetch('/api/locations/')
-    .then(response => response.json())
-    .then(data => {
+// Global variable to store markers
+var markers = {};
 
-        var places = data.locations;
-        var history = document.getElementById('travel-history');
-        var markers = {};
-        places.forEach(function(place){
+// Function to load locations from API and show on map
+function loadLocations(apiUrl) {
+    // Clear old markers and history first
+    for (var key in markers) {
+        map.removeLayer(markers[key]);
+    }
+    markers = {};
+    document.getElementById('travel-history').innerHTML = '';
 
-            history.innerHTML += `
-                <div id="history-${place.id}"> 
-                    <h3>${place.name}</h3>
-                    <p>${place.city}, ${place.country}</p>
-                </div>
-            `;
-        });    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            var places = data.locations;
+            var history = document.getElementById('travel-history');
 
-        places.forEach(function(place) {
-
-            document.getElementById(`history-${place.id}`).addEventListener('click', function() {
-
-                savedLocationId = place.id;
-
-                selectedLatitude = place.latitude;
-                selectedLongitude = place.longitude;
-
-                map.setView([place.latitude, place.longitude], 15);
-
-                markers[place.id].openPopup();
-
-                document.getElementById('map').scrollIntoView({
-                    behavior: 'smooth'
-                });
-
+            places.forEach(function(place) {
+                history.innerHTML += `
+                    <div id="history-${place.id}">
+                        <h3>${place.name}</h3>
+                        <p>${place.city}, ${place.country}</p>
+                    </div>
+                `;
             });
 
-        });
-
-         places.forEach(function(place) {
-
-            var photos="";
-
-            if (place.photos && place.photos.length > 0){
-                photos = '<div class="photo-grid">';
-                place.photos.forEach(function(photo){
-
-                    photos += `
-                        <div class="photo-item">
-                            <img src="${photo.image}" class="photo-preview">
-                            <button 
-                                class="delete-photo-btn" 
-                                data-photo-id="${photo.id}"
-                                data-location-id="${place.id}">
-                                Delete
-                            </button>
-                        </div>
-                    `;
-
+            places.forEach(function(place) {
+                document.getElementById(`history-${place.id}`).addEventListener('click', function() {
+                    savedLocationId = place.id;
+                    selectedLatitude = place.latitude;
+                    selectedLongitude = place.longitude;
+                    map.setView([place.latitude, place.longitude], 15);
+                    markers[place.id].openPopup();
+                    document.getElementById('map').scrollIntoView({behavior: 'smooth'});
                 });
-                photos += '</div>';
-            }
-
-            var popupContent = `
-                <h3>${place.name}, ${place.city}, ${place.country}</h3>
-
-                ${photos}
-
-                <p>Latitude: ${place.latitude}</p>
-                <p>Longitude: ${place.longitude}</p>
-
-                <p>Visited: ${place.visit_date}</p>
-                <p>${place.notes}</p>
-            `;
-
-            var marker = L.marker([place.latitude, place.longitude])
-                .addTo(map)
-                .bindPopup(popupContent);
-
-            markers[place.id] = marker;    
-
-            marker.on('click', function() {
-                savedLocationId = place.id;
-
-                document.getElementById('save-location-btn').textContent = 'Update Location';
-
-                selectedLatitude = place.latitude;
-                selectedLongitude = place.longitude;
-
-                console.log('Selected Location ID:', savedLocationId);
-                console.log('Selected Latitude:', selectedLatitude);
-                console.log('Selected Longitude:', selectedLongitude);
-
-                document.getElementById('location-name').value = place.name;
-                document.getElementById('country').value = place.country;
-                document.getElementById('city').value = place.city;
-                document.getElementById('visit-date').value = place.visit_date;
-                document.getElementById('notes').value = place.notes;
-
-                alert('Location selected: ' + place.name);
             });
 
+            places.forEach(function(place) {
+                var photos = "";
+                if (place.photos && place.photos.length > 0) {
+                    photos = '<div class="photo-grid">';
+                    place.photos.forEach(function(photo) {
+                        photos += `
+                            <div class="photo-item">
+                                <img src="${photo.image}" class="photo-preview">
+                                <button class="delete-photo-btn" data-photo-id="${photo.id}" data-location-id="${place.id}">Delete</button>
+                            </div>
+                        `;
+                    });
+                    photos += '</div>';
+                }
+
+                var popupContent = `
+                    <h3>${place.name}, ${place.city}, ${place.country}</h3>
+                    ${photos}
+                    <p>Latitude: ${place.latitude}</p>
+                    <p>Longitude: ${place.longitude}</p>
+                    <p>Visited: ${place.visit_date}</p>
+                    <p>${place.notes}</p>
+                `;
+
+                var marker = L.marker([place.latitude, place.longitude])
+                    .addTo(map)
+                    .bindPopup(popupContent);
+                markers[place.id] = marker;
+
+                marker.on('click', function() {
+                    savedLocationId = place.id;
+                    document.getElementById('save-location-btn').textContent = 'Update Location';
+                    selectedLatitude = place.latitude;
+                    selectedLongitude = place.longitude;
+                    document.getElementById('location-name').value = place.name;
+                    document.getElementById('country').value = place.country;
+                    document.getElementById('city').value = place.city;
+                    document.getElementById('visit-date').value = place.visit_date;
+                    document.getElementById('notes').value = place.notes;
+                });
+            });
         });
-      
-    });
+}
+
+// Load all locations when page first opens
+loadLocations('/api/locations/');
+
+// Search button click event
+document.getElementById('search-btn').addEventListener('click', function() {
+    var searchText = document.getElementById('search-input').value;
+    var countryFilter = document.getElementById('filter-country').value;
+    var apiUrl = '/api/locations/?';
+    if (searchText) {
+        apiUrl += 'search=' + encodeURIComponent(searchText) + '&';
+    }
+    if (countryFilter) {
+        apiUrl += 'country=' + encodeURIComponent(countryFilter);
+    }
+    loadLocations(apiUrl);
+});
+
+// Reset search button click event
+document.getElementById('reset-search-btn').addEventListener('click', function() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('filter-country').value = '';
+    loadLocations('/api/locations/');
+});
 
 var currentLocationMarker = null;
 var currentLatitude = null;

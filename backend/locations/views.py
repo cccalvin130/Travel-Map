@@ -12,6 +12,12 @@ def main_map(request):
 
     return render(request, 'locations/Main-Map.html')
 
+def profile_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    return render(request, 'locations/Profile.html')
+
 def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')

@@ -15,11 +15,28 @@
 
     <h1> My Travel Map</h1>
 
-   <a href="{% url 'logout' %}"
-   id="logout-btn"
-   style="display: inline-block; padding: 10px 18px; background: white; color: #88B9E6; border: 2px solid #88B9E6; border-radius: 8px; text-decoration: none;">
-   Logout
-</a>
+   <div style="margin-bottom: 20px;">
+       <a href="{% url 'logout' %}"
+       style="display: inline-block; padding: 10px 18px; background: white; color: #88B9E6; border: 2px solid #88B9E6; border-radius: 8px; text-decoration: none; margin-right: 10px;">
+       Logout
+       </a>
+       <a href="{% url 'profile-page' %}"
+       style="display: inline-block; padding: 10px 18px; background: #88B9E6; color: white; border: 2px solid #88B9E6; border-radius: 8px; text-decoration: none;">
+       My Profile
+       </a>
+   </div>
+
+    <!-- Search and Filter Bar -->
+    <div style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+        <input id="search-input" type="text" placeholder="🔍 Search location name..." style="padding: 8px; width: 250px; margin-right: 10px;">
+        <input id="filter-country" type="text" placeholder="Filter by country" style="padding: 8px; width: 150px; margin-right: 10px;">
+        <button id="search-btn" style="padding: 8px 20px; background: #88B9E6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Search
+        </button>
+        <button id="reset-search-btn" style="padding: 8px 20px; background: #ccc; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;">
+            Reset
+        </button>
+    </div>
 
     <button id="location-btn"> My Current Location</button>
 
@@ -54,7 +71,7 @@
     >
     </script>
 
-    <script src="{% static 'locations/map.js' %}?v=2"></script>
+    <script src="{% static 'locations/map.js' %}?v=3"></script>
 
 </body>
 </html>

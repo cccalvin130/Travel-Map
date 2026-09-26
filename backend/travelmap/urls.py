@@ -7,13 +7,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from locations.views import main_map, login_page, register_page, logout_page
+from locations.views import main_map, profile_page, login_page, register_page, logout_page
 
 urlpatterns=[
     path('login/', login_page, name='login'),
     path('register/', register_page, name='register'),
     path('logout/', logout_page, name='logout'),
     path('', main_map, name='main-map'),
+    path('profile/', profile_page, name='profile-page'),
 
     # Django admin interface
     path('admin/', admin.site.urls),
