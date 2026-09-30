@@ -102,26 +102,67 @@ function loadLocations(apiUrl) {
 // Load all locations when page first opens
 loadLocations('/api/locations/');
 
-// Search button click event
 document.getElementById('search-btn').addEventListener('click', function() {
+
     var searchText = document.getElementById('search-input').value;
-    var countryFilter = document.getElementById('filter-country').value;
-    var apiUrl = '/api/locations/?';
-    if (searchText) {
-        apiUrl += 'search=' + encodeURIComponent(searchText) + '&';
+
+    if (searchText.trim() === '') {
+        alert('Please enter a location to search.');
+        return;
     }
-    if (countryFilter) {
-        apiUrl += 'country=' + encodeURIComponent(countryFilter);
-    }
-    loadLocations(apiUrl);
+
+    var searchUrl = 'https://nominatim.openstreetmap.org/search'
+        + '?q=' + encodeURIComponent(searchText)
+        + '&format=jsonv2'
+        + '&addressdetails=1'
+        + '&limit=1';
+
+    fetch(searchUrl)
+        .then(response => response.json())
+        .then(function(results) {
+
+            if (results.length === 0) {
+                alert('Location not found.');
+                return;
+            }
+
+            var result = results[0];
+
+            console.log('Search result:', result);
+
+            document.getElementById('location-name').value = result.name || '';
+            document.getElementById('country').value = result.address.country || '';
+            document.getElementById('city').value =
+                result.address.city ||
+                result.address.town ||
+                result.address.municipality ||
+                result.address.village ||
+                '';
+
+            var latitude = parseFloat(result.lat);
+            var longitude = parseFloat(result.lon);
+
+            selectedLatitude = latitude;
+            selectedLongitude = longitude;
+
+            map.setView([latitude, longitude], 15);
+
+            if (selectedLocationMarker) {
+                map.removeLayer(selectedLocationMarker);
+            }
+
+            selectedLocationMarker = L.marker([latitude, longitude])
+                .addTo(map)
+                .bindPopup(result.display_name)
+                .openPopup();
+        })
+        .catch(function(error) {
+            console.log(error);
+            alert('Failed to search for the location.');
+        });
 });
 
-// Reset search button click event
-document.getElementById('reset-search-btn').addEventListener('click', function() {
-    document.getElementById('search-input').value = '';
-    document.getElementById('filter-country').value = '';
-    loadLocations('/api/locations/');
-});
+
 
 var currentLocationMarker = null;
 var currentLatitude = null;
