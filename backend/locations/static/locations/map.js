@@ -187,6 +187,35 @@ document.getElementById('location-btn').addEventListener('click', function() {
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
 
+            var reverseUrl = 'https://nominatim.openstreetmap.org/reverse'
+                + '?lat=' + latitude
+                + '&lon=' + longitude
+                + '&format=jsonv2'
+                + '&addressdetails=1';
+
+            fetch(reverseUrl)
+                .then(response => response.json())
+                .then(function(result) {
+
+                    console.log('Current location result:', result);
+
+                    var address = result.address;
+
+                    document.getElementById('country').value =
+                        address.country || '';
+
+                    document.getElementById('city').value =
+                        address.city ||
+                        address.town ||
+                        address.municipality ||
+                        address.village ||
+                        '';
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    alert('Failed to get location information.');
+                });
+
             savedLocationId = null;
             document.getElementById('save-location-btn').textContent = 'Save Location';
 
@@ -322,6 +351,35 @@ map.on('click', function(event) {
 
     selectedLatitude = latitude;
     selectedLongitude = longitude;
+
+    var reverseUrl = 'https://nominatim.openstreetmap.org/reverse'
+    + '?lat=' + latitude
+    + '&lon=' + longitude
+    + '&format=jsonv2'
+    + '&addressdetails=1';
+
+    fetch(reverseUrl)
+        .then(response => response.json())
+        .then(function(result) {
+
+            console.log('Reverse search result:', result);
+
+            var address = result.address;
+
+            document.getElementById('country').value =
+                address.country || '';
+
+            document.getElementById('city').value =
+                address.city ||
+                address.town ||
+                address.municipality ||
+                address.village ||
+                '';
+        })
+        .catch(function(error) {
+            console.log(error);
+            alert('Failed to get location information.');
+        });
 
     document.getElementById('location-name').value = '';
     document.getElementById('country').value = '';
