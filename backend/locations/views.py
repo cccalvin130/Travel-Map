@@ -286,11 +286,17 @@ def photo_list(request, location_id):
         description = request.POST.get('description', '')
 
         # Create a new photo and save to database
-        new_photo = Photo.objects.create(
-            location=location,
-            image=image_file,
-            description=description,
-        )
+        try:
+            new_photo = Photo.objects.create(
+                location=location,
+                image=image_file,
+                description=description,
+            )
+        except Exception as e:
+            print("CLOUDINARY UPLOAD ERROR:", repr(e))
+            return JsonResponse({
+                'error': str(e)
+            }, status=500)
 
         return JsonResponse({
             'message': 'Photo uploaded successfully',
