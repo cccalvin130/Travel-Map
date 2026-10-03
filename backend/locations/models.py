@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from cloudinary.models import CloudinaryField
 
 
 class Location(models.Model):
@@ -73,7 +74,7 @@ class Photo(models.Model):
     # Image file
     # ImageField = designed for images, automatically validates that upload is an image
     # upload_to = folder where images are stored
-    image = models.ImageField(upload_to='location_photos/')
+    image = CloudinaryField('image')
 
     # Photo description, e.g. "Eiffel Tower at sunset", optional
     description = models.CharField(max_length=200, blank=True)
